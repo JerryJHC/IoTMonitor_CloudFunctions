@@ -1,13 +1,28 @@
 import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
-
-// The Firebase Admin SDK to access the Firebase Realtime Database.
-const admin = require('firebase-admin');
 admin.initializeApp();
 
-export const save = functions.https.onRequest((request, response) => {
-    // Push the new message into the Realtime Database using the Firebase Admin SDK.
-    return admin.firestore().ref('/monitor').push({ temperature: 20 , humidity: 30, pressure: 15 }).then( (snapshot: { ref: { toString: () => string; }; }) => response.redirect(303, snapshot.ref.toString()));
+//Collect temperature, humidity and pressure values and store them into the database
+export const save = functions.https.onRequest(async (request, response) => {
+    const values = request.body;
+    return response.send('Saved: ' + JSON.stringify(values));
+});
+
+//Return temperature value with datetime
+export const temperature = functions.https.onRequest(async (request, response) => {
+    const docs = await admin.firestore().collection('temperature').get();
+    return response.send(docs.docs.map(doc => doc.data()));
+});
+
+//Return humidity value with datetime
+export const humidity = functions.https.onRequest(async (request, response) => {
+    const docs = await admin.firestore().collection('humidity').get();
+    return response.send(docs.docs.map(doc => doc.data()));
+});
+
+//Return pressure value with datetime
+export const pressure = functions.https.onRequest(async (request, response) => {
+    const docs = await admin.firestore().collection('pressure').get();
+    return response.send(docs.docs.map(doc => doc.data()));
 });
