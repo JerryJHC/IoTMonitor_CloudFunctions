@@ -10,14 +10,21 @@ interface monitor {
     datetime: string
 }
 
+function getNumber(value: any): number{
+    if( typeof value === 'string' ){
+        return parseFloat(value);
+    }
+    return value;
+}
+
 //Collect temperature, humidity and pressure values and store them into the database
 export const save = functions.https.onRequest(async (request, response) => {
     //Get values
     const values: monitor = request.body;
     const datetime = new Date(values.datetime);
-    const t = { "value": values.temperature, "datetime": admin.firestore.Timestamp.fromDate(datetime) };
-    const h = { "value": values.humidity, "datetime": admin.firestore.Timestamp.fromDate(datetime) };
-    const p = { "value": values.pressure, "datetime": admin.firestore.Timestamp.fromDate(datetime) };
+    const t = { "value": getNumber(values.temperature), "datetime": admin.firestore.Timestamp.fromDate(datetime) };
+    const h = { "value": getNumber(values.humidity), "datetime": admin.firestore.Timestamp.fromDate(datetime) };
+    const p = { "value": getNumber(values.pressure), "datetime": admin.firestore.Timestamp.fromDate(datetime) };
 
     //Save values
     await admin.firestore().collection('temperature').add(t);
