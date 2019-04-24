@@ -58,18 +58,18 @@ function getMonitorValues(docs: FirebaseFirestore.QuerySnapshot): monitorValue[]
 
 //Return temperature value with datetime
 export const temperature = functions.https.onRequest(async (request, response) => {
-    const docs = await admin.firestore().collection('temperature').get();
+    const docs = await admin.firestore().collection('temperature').orderBy("datetime", "desc").get();
     return response.send(getMonitorValues(docs));
 });
 
 //Return humidity value with datetime
 export const humidity = functions.https.onRequest(async (request, response) => {
-    const docs = await admin.firestore().collection('humidity').get();
+    const docs = await admin.firestore().collection('humidity').orderBy("datetime", "desc").get();
     return response.send(getMonitorValues(docs));
 });
 
 //Return pressure value with datetime
 export const pressure = functions.https.onRequest(async (request, response) => {
-    const docs = await admin.firestore().collection('pressure').get();
+    const docs = await admin.firestore().collection('pressure').orderBy("datetime", "desc").get();
     return response.send(getMonitorValues(docs));
 });
