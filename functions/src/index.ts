@@ -7,8 +7,7 @@ admin.initializeApp();
 interface monitor {
     temperature: number,
     humidity: number
-    pressure: number,
-    datetime: string
+    pressure: number
 }
 
 //Parse string value to number
@@ -25,7 +24,7 @@ function getNumber(value: any): number {
 export const save = functions.https.onRequest(async (request, response) => {
     //Get values
     const values: monitor = request.body;
-    const datetime = new Date(values.datetime);
+    const datetime = new Date(Date.now());
     const t = { "value": getNumber(values.temperature), "datetime": admin.firestore.Timestamp.fromDate(datetime) };
     const h = { "value": getNumber(values.humidity), "datetime": admin.firestore.Timestamp.fromDate(datetime) };
     const p = { "value": getNumber(values.pressure), "datetime": admin.firestore.Timestamp.fromDate(datetime) };
