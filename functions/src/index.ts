@@ -55,20 +55,25 @@ function getMonitorValues(docs: FirebaseFirestore.QuerySnapshot): monitorValue[]
     return monitorValues;
 }
 
+//Perform a query in firestore and return docs
+async function getDocs(collection: string, limit = 1): Promise<FirebaseFirestore.QuerySnapshot> {
+    return await admin.firestore().collection(collection).orderBy("datetime", "desc").limit(limit).get()
+}
+
 //Return temperature value with datetime
 export const temperature = functions.https.onRequest(async (request, response) => {
-    const docs = await admin.firestore().collection('temperature').orderBy("datetime", "desc").get();
+    const docs = await getDocs('temperature');
     return response.send(getMonitorValues(docs));
 });
 
 //Return humidity value with datetime
 export const humidity = functions.https.onRequest(async (request, response) => {
-    const docs = await admin.firestore().collection('humidity').orderBy("datetime", "desc").get();
+    const docs = await getDocs('humidity');
     return response.send(getMonitorValues(docs));
 });
 
 //Return pressure value with datetime
 export const pressure = functions.https.onRequest(async (request, response) => {
-    const docs = await admin.firestore().collection('pressure').orderBy("datetime", "desc").get();
+    const docs = await getDocs('pressure');
     return response.send(getMonitorValues(docs));
 });
