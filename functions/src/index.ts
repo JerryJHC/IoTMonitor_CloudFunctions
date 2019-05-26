@@ -47,41 +47,47 @@ interface monitorValue {
     datetime: Date
 }
 
+//Represents a query of monitor values
+interface queryMonitorValues {
+    startDateTime: string,
+    endDateTime: string
+}
+
 //Transform Firestore values to json format
 function getMonitorValues(docs: FirebaseFirestore.QuerySnapshot): monitorValue[] {
     const monitorValues: monitorValue[] = [];
     docs.docs.map(doc => {
-        let s = doc.data();
+        const s = doc.data();
         monitorValues.push({ "value": s.value, "datetime": s.datetime.toDate() });
     });
     return monitorValues;
 }
 
-//Perform a query in firestore and return docs
-async function getDocs(collection: string, limit = 1): Promise<FirebaseFirestore.QuerySnapshot> {
-    return await admin.firestore().collection(collection).orderBy("datetime", "desc").limit(limit).get()
+//Analyze request, perform a query in firestore and return docs
+async function getDocs(request: functions.https.Request, response: functions.Response, collection: string) {
+    cors(request, response, async () => {
+        let docs: FirebaseFirestore.QuerySnapshot;
+        if (request.method == "POST") {
+            const query: queryMonitorValues = request.body;
+            docs = await admin.firestore().collection(collection).where("datetime", ">=", new Date(query.startDateTime)).where("datetime", "<=", new Date(query.endDateTime)).orderBy("datetime", "desc").get();
+        } else {
+            docs = await admin.firestore().collection(collection).orderBy("datetime", "desc").limit(1).get();
+        }
+        response.send(getMonitorValues(docs));
+    });
 }
 
 //Return temperature value with datetime
 export const temperature = functions.https.onRequest(async (request, response) => {
-    cors(request, response, async () => {
-        const docs = await getDocs('temperature');
-        return response.send(getMonitorValues(docs));
-    });
+    await getDocs(request, response, 'temperature')
 });
 
 //Return humidity value with datetime
 export const humidity = functions.https.onRequest(async (request, response) => {
-    cors(request, response, async () => {
-        const docs = await getDocs('humidity');
-        return response.send(getMonitorValues(docs));
-    });
+    await getDocs(request, response, 'humidity');
 });
 
 //Return pressure value with datetime
 export const pressure = functions.https.onRequest(async (request, response) => {
-    cors(request, response, async () => {
-        const docs = await getDocs('pressure');
-        return response.send(getMonitorValues(docs));
-    });
+    await getDocs(request, response, 'pressure');
 });
