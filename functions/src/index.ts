@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
+const cors = require('cors')({ origin: true });
+
 admin.initializeApp();
 
 //Represents monitor values
@@ -47,7 +49,7 @@ interface monitorValue {
 
 //Transform Firestore values to json format
 function getMonitorValues(docs: FirebaseFirestore.QuerySnapshot): monitorValue[] {
-    let monitorValues: monitorValue[] = [];
+    const monitorValues: monitorValue[] = [];
     docs.docs.map(doc => {
         let s = doc.data();
         monitorValues.push({ "value": s.value, "datetime": s.datetime.toDate() });
@@ -62,18 +64,24 @@ async function getDocs(collection: string, limit = 1): Promise<FirebaseFirestore
 
 //Return temperature value with datetime
 export const temperature = functions.https.onRequest(async (request, response) => {
-    const docs = await getDocs('temperature');
-    return response.send(getMonitorValues(docs));
+    cors(request, response, async () => {
+        const docs = await getDocs('temperature');
+        return response.send(getMonitorValues(docs));
+    });
 });
 
 //Return humidity value with datetime
 export const humidity = functions.https.onRequest(async (request, response) => {
-    const docs = await getDocs('humidity');
-    return response.send(getMonitorValues(docs));
+    cors(request, response, async () => {
+        const docs = await getDocs('humidity');
+        return response.send(getMonitorValues(docs));
+    });
 });
 
 //Return pressure value with datetime
 export const pressure = functions.https.onRequest(async (request, response) => {
-    const docs = await getDocs('pressure');
-    return response.send(getMonitorValues(docs));
+    cors(request, response, async () => {
+        const docs = await getDocs('pressure');
+        return response.send(getMonitorValues(docs));
+    });
 });
