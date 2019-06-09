@@ -67,9 +67,9 @@ function getMonitorValues(docs: FirebaseFirestore.QuerySnapshot): monitorValue[]
 async function getDocs(request: functions.https.Request, response: functions.Response, collection: string) {
     cors(request, response, async () => {
         let docs: FirebaseFirestore.QuerySnapshot;
-        if (request.method == "POST") {
+        if (request.method === "POST") {
             const query: queryMonitorValues = request.body;
-            docs = await admin.firestore().collection(collection).where("datetime", ">=", new Date(query.startDateTime)).where("datetime", "<=", new Date(query.endDateTime)).orderBy("datetime", "desc").get();
+            docs = await admin.firestore().collection(collection).where("datetime", ">=", new Date(query.startDateTime)).where("datetime", "<=", new Date(query.endDateTime)).orderBy("datetime", "asc").get();
         } else {
             docs = await admin.firestore().collection(collection).orderBy("datetime", "desc").limit(1).get();
         }
