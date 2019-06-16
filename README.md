@@ -1,3 +1,9 @@
-# Firebase
+# IoTMonitor
 
-Cloud Functions para ingresar valores de temperature, humidity y pressure, endpoints para solicitar los valores albergados en FireStore.
+Main project https://github.com/JerryJHC/IoTMonitor_UI
+
+## Cloud Functions
+
+This project contains the endpoint to save measurements in Firestore and the endpoints to request each one (temperature, humidity and pressure)
+
+It is implemented using the Firebase Cloud Functions service.
